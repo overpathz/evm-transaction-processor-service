@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.10.xsd">
+
+    <!-- Step 1: Create the base transactions table with partitioning and composite primary key -->
+    <changeSet id="1" author="overpathz">
+        <sql>
+            CREATE TABLE transactions (
+                                          id SERIAL,
+                                          hash VARCHAR(66) NOT NULL,
+                                          from_address VARCHAR(42),
+                                          to_address VARCHAR(42),
+                                          value NUMERIC,
+                                          gas NUMERIC,
+                                          gas_price NUMERIC,
+                                          block_number NUMERIC,
+                                          timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                          partition_date DATE NOT NULL DEFAULT CURRENT_DATE,
+                                          PRIMARY KEY (id, partition_date)
+            ) PARTITION BY RANGE (partition_date);
+        </sql>
+    </changeSet>
+
+    <changeSet id="2" author="overpathz">
+        <sql>
+            CREATE TABLE IF NOT EXISTS transactions_2024_10
+                PARTITION OF transactions
+                FOR VALUES FROM ('2024-11-01') TO ('2024-12-01');
+
+            CREATE TABLE IF NOT EXISTS transactions_2024_11
+                PARTITION OF transactions
+                FOR VALUES FROM ('2024-12-01') TO ('2025-01-01');
+
+            CREATE TABLE IF NOT EXISTS transactions_2025_01
+                PARTITION OF transactions
+                FOR VALUES FROM ('2025-01-01') TO ('2025-02-01');
+        </sql>
+    </changeSet>
+</databaseChangeLog>
