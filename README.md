@@ -48,5 +48,5 @@ http://localhost:8080/actuator/metrics<br><br>
 "evm.blocks.processed.count",<br>
 "evm.transaction.batches.processed",<br>
 "evm.transaction.saving.time",<br>
-"evm.transactions.per.block",<br><br>
-"evm.transactions.processed.count",
+"evm.transactions.per.block",<br>
+"evm.transactions.processed.count",<br><br>
