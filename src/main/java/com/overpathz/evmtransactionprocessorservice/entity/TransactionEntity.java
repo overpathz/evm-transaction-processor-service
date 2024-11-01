@@ -10,13 +10,7 @@ import java.sql.Timestamp;
 
 @Entity
 @Table(
-        name = "transactions",
-        indexes = {
-                @Index(name = "idx_from_address", columnList = "from_address"),
-                @Index(name = "idx_to_address", columnList = "to_address"),
-                @Index(name = "idx_block_number", columnList = "block_number")
-        },
-        uniqueConstraints = @UniqueConstraint(columnNames = {"hash", "block_number"})
+   name = "transactions"
 )
 @NoArgsConstructor
 @Getter

@@ -47,10 +47,10 @@
 
     <changeSet id="4" author="overpathz">
         <sql splitStatements="false">
-            CREATE INDEX idx_transactions_hash ON transactions (hash);
-            CREATE INDEX idx_transactions_from_address ON transactions (from_address);
-            CREATE INDEX idx_transactions_to_address ON transactions (to_address);
-            CREATE INDEX idx_transactions_search_vector ON transactions USING GIN (search_vector);
+            CREATE INDEX IF NOT EXISTS idx_transactions_hash ON transactions (hash);
+            CREATE INDEX IF NOT EXISTS idx_transactions_from_address ON transactions (from_address);
+            CREATE INDEX IF NOT EXISTS idx_transactions_to_address ON transactions (to_address);
+            CREATE INDEX IF NOT EXISTS idx_transactions_search_vector ON transactions USING GIN (search_vector);
         </sql>
     </changeSet>
 
