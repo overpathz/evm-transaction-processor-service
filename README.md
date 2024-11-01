@@ -24,8 +24,8 @@ Get a token and set it as a ENV variable at project root in .env file. It will b
 ## Setup Instructions
 
 1. Clone the repository
-git clone https://github.com/overpathz/evm-transaction-processor-service.git
-cd evm-transaction-processor-service
+git clone https://github.com/overpathz/evm-transaction-processor-service.git<br>
+cd evm-transaction-processor-service<br>
 
 2. Configure environment variables (.env file in base dir)
 INFURA_API_KEY=your_infura_api_key
