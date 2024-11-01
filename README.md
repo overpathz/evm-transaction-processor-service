@@ -31,17 +31,17 @@ cd evm-transaction-processor-service<br>
 INFURA_API_KEY=your_infura_api_key<br>
 
 3. Run the service with Docker compoe<br>
-docker-compose up --build<br><br>
+docker-compose up --build<br>
 
 <b>Check api doc on swagger locally:</b><br>
-http://localhost:8080/swagger-ui.html<br><br>
+http://localhost:8080/swagger-ui.html<br>
 
 <br>Api docs as well:</b><br>
 http://localhost:8080/v3/api-docs<br>
 
 <br>Metrics and healthcheck</b><br>
 http://localhost:8080/actuator/health<br>
-http://localhost:8080/actuator/metrics<br><br>
+http://localhost:8080/actuator/metrics<br>
 
 <b>Metrics names:</b><br>
 "evm.block.processing.time",<br>
