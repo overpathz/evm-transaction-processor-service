@@ -15,5 +15,15 @@ spring:
     enabled: true
     change-log: classpath:/db/changelog/db.changelog-1.0-initial-schema.xml
 
-WEB3J_CLIENT_ADDRESS:
-  https://mainnet.infura.io/v3/{INFURA_PROJECT_ID}
+web3j:
+  client-address: https://mainnet.infura.io/v3/..
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics
+
+logging:
+  level:
+    root: INFO

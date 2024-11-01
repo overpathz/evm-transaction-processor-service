@@ -1,20 +1,31 @@
 package com.overpathz.evmtransactionprocessorservice.repo;
 
 import com.overpathz.evmtransactionprocessorservice.entity.TransactionEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.math.BigInteger;
-import java.util.List;
+import java.util.Optional;
 
 public interface TransactionRepository extends JpaRepository<TransactionEntity, String> {
 
     @Query("SELECT t FROM TransactionEntity t WHERE " +
-           "(:fromAddress IS NULL OR t.fromAddress = :fromAddress) AND " +
-           "(:toAddress IS NULL OR t.toAddress = :toAddress)")
-    List<TransactionEntity> searchTransactions(@Param("fromAddress") String fromAddress,
-                                               @Param("toAddress") String toAddress);
+            "(:fromAddress IS NULL OR t.fromAddress = :fromAddress) AND " +
+            "(:toAddress IS NULL OR t.toAddress = :toAddress) AND " +
+            "(:blockNumber IS NULL OR t.blockNumber = :blockNumber)")
+    Page<TransactionEntity> searchTransactions(@Param("fromAddress") String fromAddress,
+                                               @Param("toAddress") String toAddress,
+                                               @Param("blockNumber") BigInteger blockNumber,
+                                               Pageable pageable);
 
-    BigInteger findMaxBlockNumber();
+    @Query("SELECT MAX(e.blockNumber) FROM TransactionEntity e")
+    Optional<BigInteger> findMaxBlockNumber();
+
+    @Query(value = "SELECT * FROM transactions t WHERE t.search_vector @@ plainto_tsquery(:query)",
+            countQuery = "SELECT count(*) FROM transactions t WHERE t.search_vector @@ plainto_tsquery(:query)",
+            nativeQuery = true)
+    Page<TransactionEntity> searchFullText(@Param("query") String query, Pageable pageable);
 }

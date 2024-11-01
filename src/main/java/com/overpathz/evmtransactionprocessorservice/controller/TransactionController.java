@@ -2,14 +2,13 @@ package com.overpathz.evmtransactionprocessorservice.controller;
 
 import com.overpathz.evmtransactionprocessorservice.entity.TransactionEntity;
 import com.overpathz.evmtransactionprocessorservice.repo.TransactionRepository;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.math.BigInteger;
 
 @RestController
 @RequestMapping("/api/transactions")
@@ -18,12 +17,21 @@ public class TransactionController {
 
     private final TransactionRepository transactionRepository;
 
+    @Operation(summary = "Search transactions by criteria")
     @GetMapping("/search")
-    public ResponseEntity<List<TransactionEntity>> searchTransactions(
+    public Page<TransactionEntity> searchTransactions(
             @RequestParam(required = false) String fromAddress,
-            @RequestParam(required = false) String toAddress) {
+            @RequestParam(required = false) String toAddress,
+            @RequestParam(required = false) BigInteger blockNumber,
+            Pageable pageable) {
+        return transactionRepository.searchTransactions(fromAddress, toAddress, blockNumber, pageable);
+    }
 
-        List<TransactionEntity> results = transactionRepository.searchTransactions(fromAddress, toAddress);
-        return ResponseEntity.ok(results);
+    @Operation(summary = "Full-text search in transaction input data")
+    @GetMapping("/fulltext")
+    public Page<TransactionEntity> fullTextSearch(
+            @RequestParam String query,
+            Pageable pageable) {
+        return transactionRepository.searchFullText(query, pageable);
     }
 }
