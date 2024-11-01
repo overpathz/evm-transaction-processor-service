@@ -1,5 +1,6 @@
 package com.overpathz.evmtransactionprocessorservice.controller;
 
+import com.overpathz.evmtransactionprocessorservice.dto.ProcessedTransactionInfoDto;
 import com.overpathz.evmtransactionprocessorservice.entity.TransactionEntity;
 import com.overpathz.evmtransactionprocessorservice.repo.TransactionRepository;
 import io.swagger.v3.oas.annotations.Operation;
@@ -33,5 +34,11 @@ public class TransactionController {
             @RequestParam String query,
             Pageable pageable) {
         return transactionRepository.searchFullText(query, pageable);
+    }
+
+    @Operation(summary = "Get all information about transactions")
+    @GetMapping("/info")
+    public ProcessedTransactionInfoDto getTransactionInfo() {
+        return null;
     }
 }

@@ -12,12 +12,11 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/evm-transaction
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=postgres
-      - SPRING_REDIS_URL=redis://redis:6378
     depends_on:
       - redis
       - db
-    networks:
-      - app-network
+#    networks:
+#      - app-network
 
   db:
     image: postgres:13
@@ -30,21 +29,21 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    networks:
-      - app-network
+#    networks:
+#      - app-network
 
   redis:
     image: redis:latest
     container_name: redis
     ports:
       - "6379:6379"
-    networks:
-      - app-network
+#    networks:
+#      - app-network
 
 volumes:
   postgres_data:
   redis_data:
 
-networks:
-  app-network:
-    driver: bridge
+#networks:
+#  app-network:
+#    driver: bridge

@@ -14,7 +14,9 @@ spring:
   liquibase:
     enabled: true
     change-log: classpath:/db/changelog/db.changelog-1.0-initial-schema.xml
-
+  data:
+    redis:
+      url: redis://redis:6379
 web3j:
   client-address: https://mainnet.infura.io/v3/..
 

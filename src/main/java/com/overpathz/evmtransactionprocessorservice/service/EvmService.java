@@ -135,6 +135,7 @@ public class EvmService {
             TransactionEntity transactionEntity = mapToEntity(tx, blockTimestamp);
             transactionEntities.add(transactionEntity);
 
+            // we have a lot of transaction from flowable, so we can do batch saving to decrease DB load
             if (transactionEntities.size() >= batchSize) {
                 saveTransactions(new ArrayList<>(transactionEntities));
                 transactionEntities.clear();
