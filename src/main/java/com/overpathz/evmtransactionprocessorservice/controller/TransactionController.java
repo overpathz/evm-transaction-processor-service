@@ -3,6 +3,7 @@ package com.overpathz.evmtransactionprocessorservice.controller;
 import com.overpathz.evmtransactionprocessorservice.dto.ProcessedTransactionInfoDto;
 import com.overpathz.evmtransactionprocessorservice.entity.TransactionEntity;
 import com.overpathz.evmtransactionprocessorservice.repo.TransactionRepository;
+import com.overpathz.evmtransactionprocessorservice.service.TransactionService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -15,8 +16,8 @@ import java.math.BigInteger;
 @RequestMapping("/api/transactions")
 @RequiredArgsConstructor
 public class TransactionController {
-
     private final TransactionRepository transactionRepository;
+    private final TransactionService transactionService;
 
     @Operation(summary = "Search transactions by criteria")
     @GetMapping("/search")
@@ -39,6 +40,6 @@ public class TransactionController {
     @Operation(summary = "Get all information about transactions")
     @GetMapping("/info")
     public ProcessedTransactionInfoDto getTransactionInfo() {
-        return null;
+        return transactionService.getTransactionInfo();
     }
 }
