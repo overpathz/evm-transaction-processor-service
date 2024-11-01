@@ -3,15 +3,16 @@ package com.overpathz.evmtransactionprocessorservice.service;
 import com.overpathz.evmtransactionprocessorservice.entity.TransactionEntity;
 import com.overpathz.evmtransactionprocessorservice.repo.TransactionRepository;
 import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameter;
-import org.web3j.protocol.core.methods.response.EthBlock;
-import org.web3j.protocol.core.methods.response.EthBlockNumber;
-import org.web3j.protocol.core.methods.response.Transaction;
+import org.web3j.protocol.core.methods.response.*;
 import org.web3j.protocol.http.HttpService;
 import io.reactivex.schedulers.Schedulers;
 
@@ -33,6 +34,7 @@ public class EvmService {
 
     private final TransactionRepository transactionRepository;
     private final RedisService redisService;
+    private final MeterRegistry meterRegistry;
 
     private Web3j web3j;
 
@@ -44,11 +46,27 @@ public class EvmService {
         resumeProcessing();
     }
 
+    @PreDestroy
+    public void shutdown() {
+        if (web3j != null) {
+            web3j.shutdown();
+        }
+    }
+
     private void resumeProcessing() {
         lastProcessedBlock = redisService.getLastProcessedBlock();
 
         if (lastProcessedBlock == null) {
+            // db fallback
+            lastProcessedBlock = transactionRepository.findMaxBlockNumber().orElse(null);
+            if (lastProcessedBlock != null) {
+                log.info("Resuming from last processed block in DB: {}", lastProcessedBlock);
+            }
+        }
+
+        if (lastProcessedBlock == null) {
             lastProcessedBlock = getStartingBlockNumber();
+            log.info("Starting from block: {}", lastProcessedBlock);
         }
 
         startBlockListener(lastProcessedBlock.add(BigInteger.ONE));
@@ -70,17 +88,26 @@ public class EvmService {
                 .observeOn(Schedulers.computation())
                 .subscribe(
                         ethBlock -> processBlock(ethBlock.getBlock()),
-                        error -> log.error("Error in block subscription", error)
+                        error -> {
+                            log.error("Error in block subscription", error);
+                            meterRegistry.counter("evm.block.subscription.errors").increment();
+                        }
                 );
     }
 
     private void processBlock(EthBlock.Block block) {
+        Timer.Sample blockTimer = Timer.start(meterRegistry);
         try {
             BigInteger blockNumber = block.getNumber();
             log.info("Processing block {}", blockNumber);
 
             List<EthBlock.TransactionResult> transactions = block.getTransactions();
-            log.info("Found {} transactions in block #{}", transactions.size(), blockNumber);
+            int transactionCount = transactions.size();
+            log.info("Found {} transactions in block #{}", transactionCount, blockNumber);
+
+            // Record transactions per block
+            meterRegistry.counter("evm.transactions.per.block", "blockNumber", blockNumber.toString())
+                    .increment(transactionCount);
 
             Timestamp blockTimestamp = new Timestamp(block.getTimestamp().longValueExact() * 1000);
 
@@ -88,14 +115,20 @@ public class EvmService {
 
             lastProcessedBlock = blockNumber;
             redisService.saveLastProcessedBlock(lastProcessedBlock);
+
+            blockTimer.stop(meterRegistry.timer("evm.block.processing.time"));
+
+            meterRegistry.counter("evm.blocks.processed.count").increment();
+
         } catch (Exception e) {
             log.error("Error processing block {}", block.getNumber(), e);
-            // retry if needed ?
+            meterRegistry.counter("evm.block.processing.errors").increment();
         }
     }
 
     private void processTransactions(List<EthBlock.TransactionResult> transactions, Timestamp blockTimestamp) {
         List<TransactionEntity> transactionEntities = new ArrayList<>();
+        int batchesProcessed = 0;
 
         for (EthBlock.TransactionResult txResult : transactions) {
             Transaction tx = (Transaction) txResult.get();
@@ -105,21 +138,30 @@ public class EvmService {
             if (transactionEntities.size() >= batchSize) {
                 saveTransactions(new ArrayList<>(transactionEntities));
                 transactionEntities.clear();
+                batchesProcessed++;
             }
         }
 
         if (!transactionEntities.isEmpty()) {
             saveTransactions(transactionEntities);
+            batchesProcessed++;
         }
+
+        // Record batches processed
+        meterRegistry.counter("evm.transaction.batches.processed").increment(batchesProcessed);
     }
 
     private void saveTransactions(List<TransactionEntity> transactions) {
+        Timer.Sample saveTimer = Timer.start(meterRegistry);
         try {
             transactionRepository.saveAll(transactions);
             log.info("Saved {} transactions", transactions.size());
+            meterRegistry.counter("evm.transactions.processed.count").increment(transactions.size());
         } catch (Exception e) {
             log.error("Error saving transactions", e);
-            // Implement retry logic or error handling as needed
+            meterRegistry.counter("evm.transaction.saving.errors").increment();
+        } finally {
+            saveTimer.stop(meterRegistry.timer("evm.transaction.saving.time"));
         }
     }
 
