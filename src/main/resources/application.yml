@@ -2,7 +2,7 @@ spring:
   application:
     name: evm-transaction-processor-service
   datasource:
-    url: jdbc:postgresql://localhost:5432/emv-transaction
+    url: jdbc:postgresql://db:5432/evm-transaction
     username: postgres
     password: postgres
   jpa:

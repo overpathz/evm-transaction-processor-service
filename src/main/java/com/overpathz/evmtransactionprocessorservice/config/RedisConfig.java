@@ -2,9 +2,8 @@ package com.overpathz.evmtransactionprocessorservice.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.connection.*;
-import org.springframework.data.redis.connection.lettuce.*;
-import org.springframework.data.redis.core.*;
+import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
 
 @Configuration
 public class RedisConfig {
