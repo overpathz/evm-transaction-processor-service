@@ -5,7 +5,6 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.10.xsd">
 
-    <!-- ChangeSet id="1" remains the same -->
     <changeSet id="1" author="overpathz">
         <sql>
             CREATE TABLE transactions (
@@ -24,7 +23,6 @@
         </sql>
     </changeSet>
 
-    <!-- ChangeSet id="2" remains the same -->
     <changeSet id="2" author="overpathz">
         <sql splitStatements="false">
             CREATE FUNCTION transactions_search_vector_update() RETURNS trigger LANGUAGE plpgsql AS $$
@@ -39,7 +37,6 @@
         </sql>
     </changeSet>
 
-    <!-- ChangeSet id="3" remains the same -->
     <changeSet id="3" author="overpathz">
         <sql>
             CREATE TRIGGER tsvectorupdate BEFORE INSERT OR UPDATE
@@ -48,7 +45,6 @@
         </sql>
     </changeSet>
 
-    <!-- ChangeSet id="4" remains the same -->
     <changeSet id="4" author="overpathz">
         <sql splitStatements="false">
             CREATE INDEX idx_transactions_hash ON transactions (hash);
@@ -58,7 +54,6 @@
         </sql>
     </changeSet>
 
-    <!-- Corrected ChangeSet id="5" -->
     <changeSet id="5" author="overpathz">
         <sql splitStatements="false" endDelimiter="$$;">
             -- Create partitions with a step of 100k blocks
@@ -86,11 +81,9 @@
             CREATE INDEX IF NOT EXISTS idx_transactions_search_vector_p21088704_21188703
                 ON transactions_p21088704_21188703 USING GIN (search_vector);
 
-            -- Repeat similar blocks for Partitions 2 and 3
         </sql>
     </changeSet>
 
-    <!-- ChangeSet id="6" remains the same -->
     <changeSet id="6" author="overpathz">
         <sql>
             ALTER TABLE transactions ADD CONSTRAINT transactions_hash_block_number_unique UNIQUE (hash, block_number);
