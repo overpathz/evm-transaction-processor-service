@@ -18,7 +18,7 @@ spring:
     redis:
       url: redis://redis:6379
 web3j:
-  client-address: https://mainnet.infura.io/v3/ae2eb3d5fd6b4f38b0232795e4a803b6
+  client-address: https://mainnet.infura.io/v3/${INFURA_API_KEY}
 
 management:
   endpoints:
