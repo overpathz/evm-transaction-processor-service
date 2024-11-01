@@ -23,12 +23,12 @@ Get a token and set it as a ENV variable at project root in .env file. It will b
 
 ## Setup Instructions
 
-1. Clone the repository
+1. Clone the repository<br>
 git clone https://github.com/overpathz/evm-transaction-processor-service.git<br>
 cd evm-transaction-processor-service<br>
 
-2. Configure environment variables (.env file in base dir)
-INFURA_API_KEY=your_infura_api_key
+2. Configure environment variables (.env file in base dir)<br>
+INFURA_API_KEY=your_infura_api_key<br>
 
-3. Run the service with Docker compoe
-docker-compose up --build
+3. Run the service with Docker compoe<br>
+docker-compose up --build<br>
