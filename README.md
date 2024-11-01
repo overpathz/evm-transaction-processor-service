@@ -33,8 +33,20 @@ INFURA_API_KEY=your_infura_api_key<br>
 3. Run the service with Docker compoe<br>
 docker-compose up --build<br><br>
 
-Check api doc on swagger locally:<br>
+<b>Check api doc on swagger locally:</b><br>
 http://localhost:8080/swagger-ui.html<br><br>
 
-Api docs as well:<br>
-http://localhost:8080/v3/api-docs
+<br>Api docs as well:</b><br>
+http://localhost:8080/v3/api-docs<br>
+
+<br>Metrics and healthcheck</b><br>
+http://localhost:8080/actuator/health<br>
+http://localhost:8080/actuator/metrics<br><br>
+
+<b>Metrics names:</b><br>
+"evm.block.processing.time",<br>
+"evm.blocks.processed.count",<br>
+"evm.transaction.batches.processed",<br>
+"evm.transaction.saving.time",<br>
+"evm.transactions.per.block",<br><br>
+"evm.transactions.processed.count",
